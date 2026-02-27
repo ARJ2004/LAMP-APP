@@ -48,8 +48,15 @@ function csrf_token(): string
 
 function verify_csrf(): void
 {
-    $token = $_POST['_csrf'] ?? '';
-    if (!hash_equals($_SESSION['_csrf'] ?? '', $token)) {
+    $sessionToken = $_SESSION['_csrf'] ?? null;
+    $requestToken = $_POST['_csrf'] ?? null;
+
+    if (!is_string($sessionToken) || $sessionToken === '' || !is_string($requestToken) || $requestToken === '') {
+        http_response_code(419);
+        exit('Invalid CSRF token');
+    }
+
+    if (!hash_equals($sessionToken, $requestToken)) {
         http_response_code(419);
         exit('Invalid CSRF token');
     }
