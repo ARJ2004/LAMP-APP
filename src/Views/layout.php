@@ -20,6 +20,10 @@
                     <div class="d-none d-md-flex gap-2">
                         <a href="/students" class="btn btn-sm btn-soft">Students</a>
                         <a href="/attendance" class="btn btn-sm btn-soft">Attendance</a>
+                        <a href="/results" class="btn btn-sm btn-soft">Results</a>
+                        <?php if (($_SESSION['user']['role_name'] ?? '') === 'faculty'): ?>
+                            <a href="/teacher/dashboard" class="btn btn-sm btn-soft">Teacher Dashboard</a>
+                        <?php endif; ?>
                     </div>
                 <?php endif; ?>
             </div>

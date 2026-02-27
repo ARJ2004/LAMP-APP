@@ -36,6 +36,10 @@
         <div class="d-flex gap-2">
             <a href="/students" class="btn btn-primary btn-sm">Students</a>
             <a href="/attendance" class="btn btn-outline-primary btn-sm">Attendance</a>
+            <a href="/results" class="btn btn-outline-primary btn-sm">Results</a>
+            <?php if (($user['role_name'] ?? '') === 'faculty'): ?>
+                <a href="/teacher/dashboard" class="btn btn-outline-primary btn-sm">Teacher Dashboard</a>
+            <?php endif; ?>
         </div>
     </div>
     <div class="d-flex flex-wrap gap-2">

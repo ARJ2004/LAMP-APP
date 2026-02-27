@@ -26,11 +26,11 @@
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
             <thead class="bg-light">
-                <tr><th>Date</th><th>Roll</th><th>Name</th><th>Department</th><th>Status</th></tr>
+                <tr><th>Date</th><th>Roll</th><th>Name</th><th>Department</th><th>Subject</th><th>Status</th></tr>
             </thead>
             <tbody>
             <?php if (empty($records)): ?>
-                <tr><td colspan="5" class="text-center py-4 text-muted">No attendance records found in selected range.</td></tr>
+                <tr><td colspan="6" class="text-center py-4 text-muted">No attendance records found in selected range.</td></tr>
             <?php else: ?>
                 <?php foreach ($records as $record): ?>
                     <tr>
@@ -38,6 +38,7 @@
                         <td><?= e($record['roll_number']) ?></td>
                         <td class="fw-medium"><?= e($record['full_name']) ?></td>
                         <td><?= e($record['department']) ?></td>
+                        <td><?= e($record['subject_name'] ?? 'General') ?></td>
                         <td><span class="badge text-bg-light border text-capitalize"><?= e($record['status']) ?></span></td>
                     </tr>
                 <?php endforeach; ?>

@@ -24,6 +24,8 @@ use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\StudentController;
 use App\Controllers\AttendanceController;
+use App\Controllers\ResultController;
+use App\Controllers\TeacherDashboardController;
 use App\Middleware\RequireAuth;
 use App\Middleware\RequireRole;
 
@@ -34,6 +36,8 @@ $auth = new AuthController();
 $dashboard = new DashboardController();
 $students = new StudentController();
 $attendance = new AttendanceController();
+$results = new ResultController();
+$teacherDashboard = new TeacherDashboardController();
 
 try {
 if ($path === '/') {
@@ -59,6 +63,13 @@ RequireAuth::handle();
 
 if ($path === '/dashboard' && $method === 'GET') {
     $dashboard->index();
+    exit;
+}
+
+
+if ($path === '/teacher/dashboard' && $method === 'GET') {
+    RequireRole::handle(['faculty']);
+    $teacherDashboard->index();
     exit;
 }
 
@@ -114,6 +125,19 @@ if ($path === '/attendance/mark' && $method === 'POST') {
 if ($path === '/attendance/history' && $method === 'GET') {
     RequireRole::handle(['super_admin', 'admin', 'faculty']);
     $attendance->history();
+    exit;
+}
+
+
+if ($path === '/results' && $method === 'GET') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $results->index();
+    exit;
+}
+
+if ($path === '/results/store' && $method === 'POST') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $results->store();
     exit;
 }
 
