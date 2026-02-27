@@ -1,14 +1,17 @@
 # College ERP (LAMP, PHP + MySQL)
 
-A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, Student Management (CRUD), and Attendance marking/history.
+A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, Student Management, Course/Subject management, Attendance, and Fee billing.
 
 ## Features
 - PHP 8+ + MySQL 8+ + Apache compatible structure.
-- Session-based authentication.
-- Role-based authorization middleware.
-- CSRF protection helper.
+- Session-based authentication with role-based authorization.
 - Student module: list/search/create/edit/delete.
-- Attendance module: mark by date and view history with range filters.
+- **Super Admin Student Registration**: create student login + student profile in one action.
+- **Course Management**: super admin creates courses, admin/super admin add subjects.
+- **Student Course Registration**: student users can self-register to courses.
+- **Attendance by Subject**: mark attendance for enrolled students in a selected course subject.
+- **Fee Structures + Billing**: super admin defines course fee structures, bills auto-generated for enrolled students.
+- **Student Fee Payment + Invoice**: student pays pending bill and gets invoice.
 - SQL schema and seed script.
 
 ## Quick start
@@ -20,7 +23,7 @@ A minimal, extensible College ERP starter app with authentication, RBAC, dashboa
    ```bash
    mysql -u root -p < sql/schema.sql
    ```
-3. Seed roles/admin/demo users + sample students:
+3. Seed roles/users/sample data:
    ```bash
    php scripts/seed.php
    ```
@@ -42,3 +45,6 @@ A minimal, extensible College ERP starter app with authentication, RBAC, dashboa
 - Change DB credentials in `.env` before running.
 - For Apache, point document root to `public/`.
 - Attendance routes are available at `/attendance` and `/attendance/history` for `super_admin`, `admin`, and `faculty`.
+- Student self-service routes:
+  - `/courses/register`
+  - `/billing/my-bills`
