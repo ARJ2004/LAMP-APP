@@ -23,6 +23,20 @@
                         <a href="/results" class="btn btn-sm btn-soft">Results</a>
                         <?php if (($_SESSION['user']['role_name'] ?? '') === 'faculty'): ?>
                             <a href="/teacher/dashboard" class="btn btn-sm btn-soft">Teacher Dashboard</a>
+                    <?php $role = $_SESSION['user']['role_name'] ?? ''; ?>
+                    <div class="d-none d-md-flex gap-2 flex-wrap">
+                        <?php if (in_array($role, ['super_admin', 'admin', 'faculty'], true)): ?>
+                            <a href="/students" class="btn btn-sm btn-soft">Students</a>
+                            <a href="/courses" class="btn btn-sm btn-soft">Courses</a>
+                            <a href="/attendance" class="btn btn-sm btn-soft">Attendance</a>
+                        <?php endif; ?>
+                        <?php if ($role === 'super_admin'): ?>
+                            <a href="/students/register-account" class="btn btn-sm btn-soft">Register Student</a>
+                            <a href="/billing" class="btn btn-sm btn-soft">Fee Structures</a>
+                        <?php endif; ?>
+                        <?php if ($role === 'student'): ?>
+                            <a href="/courses/register" class="btn btn-sm btn-soft">Register Course</a>
+                            <a href="/billing/my-bills" class="btn btn-sm btn-soft">My Bills</a>
                         <?php endif; ?>
                     </div>
                 <?php endif; ?>

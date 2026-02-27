@@ -20,12 +20,16 @@ require dirname(__DIR__) . '/src/Core/helpers.php';
 session_name(env('SESSION_NAME', 'college_erp_session'));
 session_start();
 
+use App\Controllers\AttendanceController;
 use App\Controllers\AuthController;
+use App\Controllers\BillingController;
+use App\Controllers\CourseController;
 use App\Controllers\DashboardController;
 use App\Controllers\StudentController;
 use App\Controllers\AttendanceController;
 use App\Controllers\ResultController;
 use App\Controllers\TeacherDashboardController;
+use App\Controllers\StudentRegistrationController;
 use App\Middleware\RequireAuth;
 use App\Middleware\RequireRole;
 
@@ -38,6 +42,9 @@ $students = new StudentController();
 $attendance = new AttendanceController();
 $results = new ResultController();
 $teacherDashboard = new TeacherDashboardController();
+$courses = new CourseController();
+$studentRegistration = new StudentRegistrationController();
+$billing = new BillingController();
 
 try {
 if ($path === '/') {
@@ -109,6 +116,47 @@ if ($path === '/students/delete' && $method === 'POST') {
     exit;
 }
 
+if ($path === '/students/register-account' && $method === 'GET') {
+    RequireRole::handle(['super_admin']);
+    $studentRegistration->create();
+    exit;
+}
+
+if ($path === '/students/register-account' && $method === 'POST') {
+    RequireRole::handle(['super_admin']);
+    $studentRegistration->store();
+    exit;
+}
+
+if ($path === '/courses' && $method === 'GET') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $courses->index();
+    exit;
+}
+
+if ($path === '/courses/store' && $method === 'POST') {
+    RequireRole::handle(['super_admin']);
+    $courses->store();
+    exit;
+}
+
+if ($path === '/courses/subjects/store' && $method === 'POST') {
+    RequireRole::handle(['super_admin', 'admin']);
+    $courses->addSubject((int)($_GET['course_id'] ?? 0));
+    exit;
+}
+
+if ($path === '/courses/register' && $method === 'GET') {
+    RequireRole::handle(['student']);
+    $courses->registerForm();
+    exit;
+}
+
+if ($path === '/courses/register' && $method === 'POST') {
+    RequireRole::handle(['student']);
+    $courses->register();
+    exit;
+}
 
 if ($path === '/attendance' && $method === 'GET') {
     RequireRole::handle(['super_admin', 'admin', 'faculty']);
@@ -138,6 +186,33 @@ if ($path === '/results' && $method === 'GET') {
 if ($path === '/results/store' && $method === 'POST') {
     RequireRole::handle(['super_admin', 'admin', 'faculty']);
     $results->store();
+if ($path === '/billing' && $method === 'GET') {
+    RequireRole::handle(['super_admin']);
+    $billing->index();
+    exit;
+}
+
+if ($path === '/billing/fee-structures/store' && $method === 'POST') {
+    RequireRole::handle(['super_admin']);
+    $billing->storeFeeStructure();
+    exit;
+}
+
+if ($path === '/billing/my-bills' && $method === 'GET') {
+    RequireRole::handle(['student']);
+    $billing->myBills();
+    exit;
+}
+
+if ($path === '/billing/pay' && $method === 'POST') {
+    RequireRole::handle(['student']);
+    $billing->payBill((int)($_GET['bill_id'] ?? 0));
+    exit;
+}
+
+if ($path === '/billing/invoice' && $method === 'GET') {
+    RequireRole::handle(['student']);
+    $billing->invoice((int)($_GET['bill_id'] ?? 0));
     exit;
 }
 

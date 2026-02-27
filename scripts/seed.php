@@ -58,7 +58,24 @@ $stmtStudent = $pdo->prepare(
 );
 
 foreach ($students as [$roll, $name, $email, $phone, $department, $semester, $batchYear]) {
+$studentUserStmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+$studentUserStmt->execute(['email' => 'student@erp.local']);
+$studentUserId = (int)($studentUserStmt->fetch()['id'] ?? 0);
+
+$students = [
+    ['CSE-001', 'Aarav Sharma', 'aarav@college.local', '9000011111', 'Computer Science', 3, $studentUserId],
+    ['ECE-014', 'Diya Patel', 'diya@college.local', '9000022222', 'Electronics', 5, null],
+    ['ME-022', 'Rahul Verma', 'rahul@college.local', '9000033333', 'Mechanical', 2, null],
+];
+
+$stmtStudent = $pdo->prepare(
+    'INSERT IGNORE INTO students (user_id, roll_number, full_name, email, phone, department, semester)
+     VALUES (:user_id, :roll_number, :full_name, :email, :phone, :department, :semester)'
+);
+
+foreach ($students as [$roll, $name, $email, $phone, $department, $semester, $userId]) {
     $stmtStudent->execute([
+        'user_id' => $userId,
         'roll_number' => $roll,
         'full_name' => $name,
         'email' => $email,
@@ -125,6 +142,34 @@ foreach ($studentSubjects as [$roll, $code]) {
         'student_id' => $studentMap[$roll],
         'subject_id' => $subjectMap[$code],
     ]);
+}
+
+$superAdminStmt = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+$superAdminStmt->execute(['email' => 'superadmin@erp.local']);
+$superAdminId = (int)($superAdminStmt->fetch()['id'] ?? 0);
+
+$courseStmt = $pdo->prepare('INSERT IGNORE INTO courses (code, name, description, created_by) VALUES (:code, :name, :description, :created_by)');
+$courseStmt->execute([
+    'code' => 'CSE-BTECH',
+    'name' => 'B.Tech Computer Science',
+    'description' => 'Core UG program',
+    'created_by' => $superAdminId ?: null,
+]);
+
+$courseIdStmt = $pdo->prepare('SELECT id FROM courses WHERE code = :code LIMIT 1');
+$courseIdStmt->execute(['code' => 'CSE-BTECH']);
+$courseId = (int)($courseIdStmt->fetch()['id'] ?? 0);
+
+if ($courseId > 0) {
+    $subjectStmt = $pdo->prepare('INSERT IGNORE INTO subjects (course_id, code, name) VALUES (:course_id, :code, :name)');
+    $subjectStmt->execute(['course_id' => $courseId, 'code' => 'CS101', 'name' => 'Programming Fundamentals']);
+    $subjectStmt->execute(['course_id' => $courseId, 'code' => 'CS102', 'name' => 'Database Systems']);
+
+    $enrollStmt = $pdo->prepare(
+        'INSERT IGNORE INTO course_enrollments (course_id, student_id)
+         SELECT :course_id, s.id FROM students s WHERE s.roll_number IN ("CSE-001", "ECE-014")'
+    );
+    $enrollStmt->execute(['course_id' => $courseId]);
 }
 
 echo "Seeding complete\n";

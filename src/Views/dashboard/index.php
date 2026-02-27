@@ -18,8 +18,8 @@
     </div>
     <div class="col-sm-6 col-lg-3">
         <div class="card-clean p-3 h-100">
-            <div class="metric-label">Student Module</div>
-            <div class="metric-value">Live</div>
+            <div class="metric-label">Module Count</div>
+            <div class="metric-value"><?= count($modules ?? []) ?></div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">

@@ -2,6 +2,7 @@
     <div>
         <h1 class="h3 page-title mb-1">Mark Attendance</h1>
         <p class="page-subtitle mb-0">Mark attendance by class (department, semester, batch) and optional subject.</p>
+        <p class="page-subtitle mb-0">Mark by course + subject so only registered students are called.</p>
     </div>
     <a class="btn btn-outline-secondary" href="/attendance/history">View History</a>
 </div>
@@ -31,11 +32,34 @@
                 <?php foreach ($subjects as $subject): ?>
                     <option value="<?= (int)$subject['id'] ?>" <?= (int)$subjectId === (int)$subject['id'] ? 'selected' : '' ?>>
                         <?= e($subject['subject_name']) ?>
+        <div class="col-md-3">
+            <label class="form-label">Attendance Date</label>
+            <input type="date" name="date" class="form-control" value="<?= e($date) ?>">
+        </div>
+        <div class="col-md-4">
+            <label class="form-label">Course</label>
+            <select name="course_id" class="form-select">
+                <option value="">Select course</option>
+                <?php foreach ($courses as $course): ?>
+                    <option value="<?= (int)$course['id'] ?>" <?= (int)$courseId === (int)$course['id'] ? 'selected' : '' ?>>
+                        <?= e($course['code'] . ' - ' . $course['name']) ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Subject</label>
+            <select name="subject_id" class="form-select">
+                <option value="">Select subject</option>
+                <?php foreach ($subjects as $subject): ?>
+                    <option value="<?= (int)$subject['id'] ?>" <?= (int)$subjectId === (int)$subject['id'] ? 'selected' : '' ?>>
+                        <?= e($subject['code'] . ' - ' . $subject['name']) ?>
                     </option>
                 <?php endforeach; ?>
             </select>
         </div>
         <div class="col-md-2 col-lg-1">
+        <div class="col-md-2">
             <button class="btn btn-soft w-100">Load</button>
         </div>
     </form>
@@ -47,6 +71,7 @@
     <input type="hidden" name="department" value="<?= e($department) ?>">
     <input type="hidden" name="semester" value="<?= (int)$semester ?>">
     <input type="hidden" name="batch_year" value="<?= (int)$batchYear ?>">
+    <input type="hidden" name="course_id" value="<?= (int)$courseId ?>">
     <input type="hidden" name="subject_id" value="<?= (int)$subjectId ?>">
     <div class="table-responsive">
         <table class="table table-hover mb-0 align-middle">
@@ -58,12 +83,16 @@
             <tbody>
             <?php if (empty($rows)): ?>
                 <tr><td colspan="6" class="text-center py-4 text-muted">No students found for selected class/subject.</td></tr>
+            <?php if ((int)$subjectId === 0): ?>
+                <tr><td colspan="5" class="text-center py-4 text-muted">Select course and subject to load class list.</td></tr>
+            <?php elseif (empty($rows)): ?>
+                <tr><td colspan="5" class="text-center py-4 text-muted">No enrolled students found for selected course.</td></tr>
             <?php else: ?>
                 <?php foreach ($rows as $row): ?>
                     <tr>
                         <td><?= e($row['roll_number']) ?></td>
                         <td class="fw-medium"><?= e($row['full_name']) ?></td>
-                        <td><?= e($row['department']) ?></td>
+                        <td><?= e((string)$row['department']) ?></td>
                         <td><?= (int)$row['semester'] ?></td>
                         <td><?= (int)($row['batch_year'] ?? 0) ?></td>
                         <td>
@@ -81,6 +110,6 @@
         </table>
     </div>
     <div class="p-3 border-top bg-white">
-        <button class="btn btn-primary">Save Attendance</button>
+        <button class="btn btn-primary" <?= (int)$subjectId === 0 ? 'disabled' : '' ?>>Save Attendance</button>
     </div>
 </form>

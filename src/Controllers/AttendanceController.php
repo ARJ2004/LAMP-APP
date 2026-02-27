@@ -16,6 +16,8 @@ final class AttendanceController
         $batchYear = (int)($_GET['batch_year'] ?? 0);
         $subjectId = (int)($_GET['subject_id'] ?? 0);
 
+        $courseId = (int)($_GET['course_id'] ?? 0);
+        $subjectId = (int)($_GET['subject_id'] ?? 0);
         $pdo = Database::connection();
         $subjects = $this->fetchSubjects($pdo, $department, $semester, $batchYear);
 
@@ -52,6 +54,36 @@ final class AttendanceController
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute($params);
+        $courses = $pdo->query('SELECT id, code, name FROM courses ORDER BY name ASC')->fetchAll();
+        $subjects = [];
+        $rows = [];
+
+        if ($courseId > 0) {
+            $subjectStmt = $pdo->prepare('SELECT id, code, name FROM subjects WHERE course_id = :course_id ORDER BY name ASC');
+            $subjectStmt->execute(['course_id' => $courseId]);
+            $subjects = $subjectStmt->fetchAll();
+        }
+
+        if ($subjectId > 0) {
+            $stmt = $pdo->prepare(
+                'SELECT s.id, s.roll_number, s.full_name, s.department, s.semester,
+                        a.status
+                 FROM course_enrollments ce
+                 JOIN students s ON s.id = ce.student_id
+                 LEFT JOIN attendance a
+                    ON a.student_id = s.id
+                   AND a.subject_id = :subject_id
+                   AND a.attendance_date = :attendance_date
+                 WHERE ce.course_id = :course_id
+                 ORDER BY s.full_name ASC'
+            );
+            $stmt->execute([
+                'subject_id' => $subjectId,
+                'attendance_date' => $date,
+                'course_id' => $courseId,
+            ]);
+            $rows = $stmt->fetchAll();
+        }
 
         view('attendance/index', [
             'title' => 'Mark Attendance',
@@ -61,6 +93,10 @@ final class AttendanceController
             'department' => $department,
             'semester' => $semester,
             'batchYear' => $batchYear,
+            'rows' => $rows,
+            'courses' => $courses,
+            'subjects' => $subjects,
+            'courseId' => $courseId,
             'subjectId' => $subjectId,
         ]);
     }
@@ -70,6 +106,7 @@ final class AttendanceController
         verify_csrf();
 
         $date = $_POST['attendance_date'] ?? date('Y-m-d');
+        $subjectId = (int)($_POST['subject_id'] ?? 0);
         $statuses = $_POST['status'] ?? [];
         $markedBy = (int)($_SESSION['user']['id'] ?? 0);
         $subjectId = (int)($_POST['subject_id'] ?? 0);
@@ -77,6 +114,7 @@ final class AttendanceController
         $pdo = Database::connection();
 
         $upsertSubject = $pdo->prepare(
+        $stmt = $pdo->prepare(
             'INSERT INTO attendance (student_id, subject_id, attendance_date, status, marked_by)
              VALUES (:student_id, :subject_id, :attendance_date, :status, :marked_by)
              ON DUPLICATE KEY UPDATE status = VALUES(status), marked_by = VALUES(marked_by), updated_at = CURRENT_TIMESTAMP'
@@ -113,6 +151,9 @@ final class AttendanceController
 
             $updateGeneral->execute([
                 'student_id' => $studentId,
+            $stmt->execute([
+                'student_id' => (int)$studentId,
+                'subject_id' => $subjectId,
                 'attendance_date' => $date,
                 'status' => $status,
                 'marked_by' => $markedBy,
@@ -137,6 +178,8 @@ final class AttendanceController
         ]);
 
         redirect('/attendance?' . $query);
+        $courseId = (int)($_POST['course_id'] ?? 0);
+        redirect('/attendance?date=' . urlencode($date) . '&course_id=' . $courseId . '&subject_id=' . $subjectId);
     }
 
     public function history(): void
@@ -150,6 +193,11 @@ final class AttendanceController
              FROM attendance a
              JOIN students s ON s.id = a.student_id
              LEFT JOIN subjects sb ON sb.id = a.subject_id
+            'SELECT a.attendance_date, a.status, s.roll_number, s.full_name, sub.name AS subject_name, c.name AS course_name
+             FROM attendance a
+             JOIN students s ON s.id = a.student_id
+             JOIN subjects sub ON sub.id = a.subject_id
+             JOIN courses c ON c.id = sub.course_id
              WHERE a.attendance_date BETWEEN :from_date AND :to_date
              ORDER BY a.attendance_date DESC, s.full_name ASC'
         );

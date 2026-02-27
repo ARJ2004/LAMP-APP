@@ -20,8 +20,20 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT fk_users_role FOREIGN KEY (role_id) REFERENCES roles(id)
 );
 
+CREATE TABLE IF NOT EXISTS courses (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  code VARCHAR(40) NOT NULL UNIQUE,
+  name VARCHAR(150) NOT NULL,
+  description TEXT NULL,
+  created_by INT UNSIGNED NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_courses_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
 CREATE TABLE IF NOT EXISTS students (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NULL UNIQUE,
   roll_number VARCHAR(40) NOT NULL UNIQUE,
   full_name VARCHAR(150) NOT NULL,
   email VARCHAR(150) NULL,
@@ -31,6 +43,7 @@ CREATE TABLE IF NOT EXISTS students (
   batch_year SMALLINT UNSIGNED NOT NULL DEFAULT 2024,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_students_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
   INDEX idx_students_roll (roll_number),
   INDEX idx_students_name (full_name),
   INDEX idx_students_class (department, semester, batch_year)
@@ -58,10 +71,32 @@ CREATE TABLE IF NOT EXISTS student_subjects (
   UNIQUE KEY uniq_student_subject (student_id, subject_id)
 );
 
+CREATE TABLE IF NOT EXISTS course_enrollments (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  course_id INT UNSIGNED NOT NULL,
+  student_id INT UNSIGNED NOT NULL,
+  registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_enrollments_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  CONSTRAINT fk_enrollments_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_course_student (course_id, student_id)
+);
+
+CREATE TABLE IF NOT EXISTS subjects (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  course_id INT UNSIGNED NOT NULL,
+  code VARCHAR(40) NOT NULL,
+  name VARCHAR(150) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_subjects_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_subject_course_code (course_id, code)
+);
+
 CREATE TABLE IF NOT EXISTS attendance (
   id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   student_id INT UNSIGNED NOT NULL,
   subject_id INT UNSIGNED NULL,
+  subject_id INT UNSIGNED NOT NULL,
   attendance_date DATE NOT NULL,
   status ENUM('present', 'absent', 'late') NOT NULL DEFAULT 'present',
   marked_by INT UNSIGNED NULL,
@@ -71,6 +106,9 @@ CREATE TABLE IF NOT EXISTS attendance (
   CONSTRAINT fk_attendance_subject FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE SET NULL,
   CONSTRAINT fk_attendance_marked_by FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE SET NULL,
   UNIQUE KEY uniq_student_date_subject (student_id, attendance_date, subject_id),
+  CONSTRAINT fk_attendance_subject FOREIGN KEY (subject_id) REFERENCES subjects(id) ON DELETE CASCADE,
+  CONSTRAINT fk_attendance_marked_by FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE SET NULL,
+  UNIQUE KEY uniq_student_subject_date (student_id, subject_id, attendance_date),
   INDEX idx_attendance_date (attendance_date),
   INDEX idx_attendance_status (status)
 );
@@ -89,4 +127,38 @@ CREATE TABLE IF NOT EXISTS results (
   CONSTRAINT fk_results_user FOREIGN KEY (entered_by) REFERENCES users(id) ON DELETE SET NULL,
   UNIQUE KEY uniq_result_entry (student_id, subject_id, exam_name),
   INDEX idx_results_exam (exam_name)
+CREATE TABLE IF NOT EXISTS fee_structures (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  course_id INT UNSIGNED NOT NULL,
+  title VARCHAR(150) NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  due_days INT UNSIGNED NOT NULL DEFAULT 30,
+  created_by INT UNSIGNED NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_fee_course FOREIGN KEY (course_id) REFERENCES courses(id) ON DELETE CASCADE,
+  CONSTRAINT fk_fee_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS student_bills (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  fee_structure_id INT UNSIGNED NOT NULL,
+  student_id INT UNSIGNED NOT NULL,
+  amount_due DECIMAL(10,2) NOT NULL,
+  due_date DATE NOT NULL,
+  status ENUM('pending', 'paid') NOT NULL DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_bill_fee_structure FOREIGN KEY (fee_structure_id) REFERENCES fee_structures(id) ON DELETE CASCADE,
+  CONSTRAINT fk_bill_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  UNIQUE KEY uniq_fee_student (fee_structure_id, student_id)
+);
+
+CREATE TABLE IF NOT EXISTS fee_payments (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  bill_id BIGINT UNSIGNED NOT NULL,
+  paid_amount DECIMAL(10,2) NOT NULL,
+  paid_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  payment_ref VARCHAR(60) NOT NULL UNIQUE,
+  CONSTRAINT fk_payment_bill FOREIGN KEY (bill_id) REFERENCES student_bills(id) ON DELETE CASCADE
 );

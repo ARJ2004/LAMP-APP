@@ -27,6 +27,7 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="bg-light">
                 <tr><th>Date</th><th>Roll</th><th>Name</th><th>Department</th><th>Subject</th><th>Status</th></tr>
+                <tr><th>Date</th><th>Roll</th><th>Name</th><th>Course</th><th>Subject</th><th>Status</th></tr>
             </thead>
             <tbody>
             <?php if (empty($records)): ?>
@@ -39,6 +40,8 @@
                         <td class="fw-medium"><?= e($record['full_name']) ?></td>
                         <td><?= e($record['department']) ?></td>
                         <td><?= e($record['subject_name'] ?? 'General') ?></td>
+                        <td><?= e($record['course_name']) ?></td>
+                        <td><?= e($record['subject_name']) ?></td>
                         <td><span class="badge text-bg-light border text-capitalize"><?= e($record['status']) ?></span></td>
                     </tr>
                 <?php endforeach; ?>
