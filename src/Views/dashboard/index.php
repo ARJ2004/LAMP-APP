@@ -33,6 +33,14 @@
 <div class="card-clean p-4 mb-4">
     <div class="d-flex flex-wrap justify-content-between gap-2 mb-3 align-items-center">
         <h2 class="h5 mb-0">Modules</h2>
+        <div class="d-flex gap-2">
+            <a href="/students" class="btn btn-primary btn-sm">Students</a>
+            <a href="/attendance" class="btn btn-outline-primary btn-sm">Attendance</a>
+            <a href="/results" class="btn btn-outline-primary btn-sm">Results</a>
+            <?php if (($user['role_name'] ?? '') === 'faculty'): ?>
+                <a href="/teacher/dashboard" class="btn btn-outline-primary btn-sm">Teacher Dashboard</a>
+            <?php endif; ?>
+        </div>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php foreach (($modules ?? []) as $module): ?>

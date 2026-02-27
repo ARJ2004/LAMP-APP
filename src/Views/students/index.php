@@ -30,12 +30,12 @@
         <table class="table table-hover mb-0 align-middle">
             <thead class="bg-light">
                 <tr>
-                    <th>#</th><th>Roll</th><th>Name</th><th>Email</th><th>Department</th><th>Sem</th><th class="text-end pe-3">Actions</th>
+                    <th>#</th><th>Roll</th><th>Name</th><th>Email</th><th>Department</th><th>Sem</th><th>Batch</th><th class="text-end pe-3">Actions</th>
                 </tr>
             </thead>
             <tbody>
             <?php if (empty($students)): ?>
-                <tr><td colspan="7" class="text-center text-muted py-4">No students found.</td></tr>
+                <tr><td colspan="8" class="text-center text-muted py-4">No students found.</td></tr>
             <?php else: ?>
                 <?php foreach ($students as $student): ?>
                     <tr>
@@ -45,6 +45,7 @@
                         <td><?= e((string)$student['email']) ?></td>
                         <td><?= e((string)$student['department']) ?></td>
                         <td><?= (int)$student['semester'] ?></td>
+                        <td><?= (int)($student['batch_year'] ?? 0) ?></td>
                         <td class="text-end pe-3">
                             <a class="btn btn-sm btn-outline-primary" href="/students/edit?id=<?= (int)$student['id'] ?>">Edit</a>
                             <form class="d-inline" method="post" action="/students/delete?id=<?= (int)$student['id'] ?>">

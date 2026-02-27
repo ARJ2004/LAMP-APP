@@ -10,6 +10,17 @@ final class DashboardController
 {
     public function index(): void
     {
+        $pdo = Database::connection();
+        $studentCount = (int)$pdo->query('SELECT COUNT(*) FROM students')->fetchColumn();
+
+        $modules = [
+            ['name' => 'Students', 'route' => '/students', 'status' => 'Live'],
+            ['name' => 'Attendance', 'route' => '/attendance', 'status' => 'Live'],
+            ['name' => 'Result Entry', 'route' => '/results', 'status' => 'Live'],
+        ];
+
+        if (($_SESSION['user']['role_name'] ?? '') === 'faculty') {
+            $modules[] = ['name' => 'Teacher Dashboard', 'route' => '/teacher/dashboard', 'status' => 'Live'];
         $user = $_SESSION['user'] ?? null;
         $role = $user['role_name'] ?? '';
         $pdo = Database::connection();
@@ -35,6 +46,7 @@ final class DashboardController
 
         view('dashboard/index', [
             'title' => 'Dashboard',
+            'user' => $_SESSION['user'] ?? null,
             'user' => $user,
             'studentCount' => $studentCount,
             'modules' => $modules,

@@ -1,6 +1,6 @@
 # College ERP (LAMP, PHP + MySQL)
 
-A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, Student Management, Course/Subject management, Attendance, and Fee billing.
+A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, Student Management (CRUD), class-based attendance, and subject-wise result entry.
 
 ## Features
 - PHP 8+ + MySQL 8+ + Apache compatible structure.

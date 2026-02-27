@@ -38,8 +38,8 @@ final class StudentController
         $pdo = Database::connection();
 
         $stmt = $pdo->prepare(
-            'INSERT INTO students (roll_number, full_name, email, phone, department, semester)
-             VALUES (:roll_number, :full_name, :email, :phone, :department, :semester)'
+            'INSERT INTO students (roll_number, full_name, email, phone, department, semester, batch_year)
+             VALUES (:roll_number, :full_name, :email, :phone, :department, :semester, :batch_year)'
         );
 
         $stmt->execute([
@@ -49,6 +49,7 @@ final class StudentController
             'phone' => trim($_POST['phone'] ?? ''),
             'department' => trim($_POST['department'] ?? ''),
             'semester' => (int)($_POST['semester'] ?? 1),
+            'batch_year' => (int)($_POST['batch_year'] ?? (int)date('Y')),
         ]);
 
         redirect('/students');
@@ -76,7 +77,7 @@ final class StudentController
         $stmt = $pdo->prepare(
             'UPDATE students
              SET roll_number = :roll_number, full_name = :full_name, email = :email, phone = :phone,
-                 department = :department, semester = :semester
+                 department = :department, semester = :semester, batch_year = :batch_year
              WHERE id = :id'
         );
 
@@ -88,6 +89,7 @@ final class StudentController
             'phone' => trim($_POST['phone'] ?? ''),
             'department' => trim($_POST['department'] ?? ''),
             'semester' => (int)($_POST['semester'] ?? 1),
+            'batch_year' => (int)($_POST['batch_year'] ?? (int)date('Y')),
         ]);
 
         redirect('/students');
