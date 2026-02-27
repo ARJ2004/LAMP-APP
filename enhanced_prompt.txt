@@ -1,0 +1,78 @@
+Design and build a scalable College ERP (Enterprise Resource Planning) web application using the LAMP stack, explicitly defined as Linux, Apache, MySQL 8+, and PHP 8+.
+
+Project objectives:
+- Develop a secure, production-ready ERP platform for college operations.
+- Implement robust role-based access control (RBAC) so each user sees only authorized data and actions.
+- Deliver a maintainable architecture that can support future modules and role expansion.
+
+Architecture and implementation requirements:
+- Use an MVC (or equivalent modular) architecture with clear separation of concerns.
+- Provide a well-organized project structure for controllers, models, views, routes, middleware, services, configs, and utilities.
+- Use environment-based configuration with `.env` and `.env.example`.
+- Follow coding best practices and PSR standards where applicable.
+
+RBAC requirements:
+- Implement authentication (login, logout, password reset, session management).
+- Define these minimum roles:
+  - Super Admin
+  - Admin
+  - Faculty
+  - Student
+  - Accountant
+  - Librarian
+- Define permissions per role (create/read/update/delete/export/approve/etc.).
+- Enforce authorization at both route level and action level.
+- Provide unauthorized access handling (403 page/API response).
+
+Core ERP modules:
+- User and Role Management
+  - User onboarding, activation/deactivation, role assignment, permission mapping.
+- Student Management
+  - Admissions, profiles, guardian details, enrollment status, academic history.
+- Faculty Management
+  - Faculty profiles, department assignment, subject/course allocation.
+- Academic Structure Management
+  - Departments, programs, semesters, courses, subjects, sections, timetable.
+- Attendance Management
+  - Faculty attendance entry, student attendance view, summary reports.
+- Examination and Grading
+  - Exam setup, marks entry, grading rules, GPA/CGPA calculation, report cards.
+- Fees and Accounts
+  - Fee plans, invoices, payment records, pending dues, receipts.
+- Library Management
+  - Book catalog, issue/return, due tracking, fine calculation.
+- Dashboards and Reports
+  - Role-specific dashboards, KPI cards, filters, downloadable reports (CSV/PDF).
+
+Database requirements:
+- Provide complete MySQL schema with:
+  - Tables, PK/FK relationships, indexes, constraints, and normalization.
+  - Seed data for roles, permissions, and demo users.
+  - Audit fields (`created_at`, `updated_at`, `created_by`, etc.) where relevant.
+- Include SQL migration/initialization scripts.
+
+Security and reliability requirements:
+- Use PDO/prepared statements to prevent SQL injection.
+- Use password hashing via bcrypt or Argon2.
+- Implement CSRF protection, input validation, output escaping, and secure session cookies.
+- Add server-side validation for all critical operations.
+- Implement centralized error handling and logging.
+
+UI/UX requirements:
+- Build responsive interfaces using Bootstrap (or equivalent CSS framework).
+- Use reusable layout components (header/sidebar/footer/forms/tables).
+- Include search, sorting, pagination, and filtering in list screens.
+
+Deliverables:
+- Full project source code and directory tree.
+- Database schema and seed SQL files.
+- Setup and deployment instructions for Apache + PHP + MySQL.
+- `.env.example` with documented configuration variables.
+- Sample credentials for each role.
+- At least one module implemented fully end-to-end as a reference pattern.
+- API endpoint list (if AJAX/API is used) with sample request/response payloads.
+
+Quality and verification:
+- Include a testing checklist for authentication, authorization, CRUD flows, and key business workflows.
+- Provide sample test cases (unit/integration/manual) and expected outcomes.
+- Ensure the system is runnable locally with demo data and role-specific access behavior.
