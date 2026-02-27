@@ -35,6 +35,7 @@ $dashboard = new DashboardController();
 $students = new StudentController();
 $attendance = new AttendanceController();
 
+try {
 if ($path === '/') {
     redirect('/login');
 }
@@ -118,3 +119,11 @@ if ($path === '/attendance/history' && $method === 'GET') {
 
 http_response_code(404);
 echo 'Not Found';
+
+} catch (\PDOException $exception) {
+    http_response_code(500);
+    view('errors/500', [
+        'title' => 'Database Error',
+        'message' => 'Database connection failed. Please verify DB settings and that MySQL is running.',
+    ]);
+}
