@@ -45,4 +45,27 @@ foreach ($users as [$name, $email, $role]) {
     ]);
 }
 
+
+$students = [
+    ['CSE-001', 'Aarav Sharma', 'aarav@college.local', '9000011111', 'Computer Science', 3],
+    ['ECE-014', 'Diya Patel', 'diya@college.local', '9000022222', 'Electronics', 5],
+    ['ME-022', 'Rahul Verma', 'rahul@college.local', '9000033333', 'Mechanical', 2],
+];
+
+$stmtStudent = $pdo->prepare(
+    'INSERT IGNORE INTO students (roll_number, full_name, email, phone, department, semester)
+     VALUES (:roll_number, :full_name, :email, :phone, :department, :semester)'
+);
+
+foreach ($students as [$roll, $name, $email, $phone, $department, $semester]) {
+    $stmtStudent->execute([
+        'roll_number' => $roll,
+        'full_name' => $name,
+        'email' => $email,
+        'phone' => $phone,
+        'department' => $department,
+        'semester' => $semester,
+    ]);
+}
+
 echo "Seeding complete\n";

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Database;
+
 final class DashboardController
 {
     public function index(): void

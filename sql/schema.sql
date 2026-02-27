@@ -33,3 +33,18 @@ CREATE TABLE IF NOT EXISTS students (
   INDEX idx_students_roll (roll_number),
   INDEX idx_students_name (full_name)
 );
+
+CREATE TABLE IF NOT EXISTS attendance (
+  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  student_id INT UNSIGNED NOT NULL,
+  attendance_date DATE NOT NULL,
+  status ENUM('present', 'absent', 'late') NOT NULL DEFAULT 'present',
+  marked_by INT UNSIGNED NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_attendance_student FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
+  CONSTRAINT fk_attendance_marked_by FOREIGN KEY (marked_by) REFERENCES users(id) ON DELETE SET NULL,
+  UNIQUE KEY uniq_student_date (student_id, attendance_date),
+  INDEX idx_attendance_date (attendance_date),
+  INDEX idx_attendance_status (status)
+);

@@ -1,6 +1,6 @@
 # College ERP (LAMP, PHP + MySQL)
 
-A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, and a complete Student Management module (CRUD).
+A minimal, extensible College ERP starter app with authentication, RBAC, dashboards, Student Management (CRUD), and Attendance marking/history.
 
 ## Features
 - PHP 8+ + MySQL 8+ + Apache compatible structure.
@@ -8,6 +8,7 @@ A minimal, extensible College ERP starter app with authentication, RBAC, dashboa
 - Role-based authorization middleware.
 - CSRF protection helper.
 - Student module: list/search/create/edit/delete.
+- Attendance module: mark by date and view history with range filters.
 - SQL schema and seed script.
 
 ## Quick start
@@ -19,7 +20,7 @@ A minimal, extensible College ERP starter app with authentication, RBAC, dashboa
    ```bash
    mysql -u root -p < sql/schema.sql
    ```
-3. Seed roles/admin/demo users:
+3. Seed roles/admin/demo users + sample students:
    ```bash
    php scripts/seed.php
    ```
@@ -40,3 +41,4 @@ A minimal, extensible College ERP starter app with authentication, RBAC, dashboa
 ## Notes
 - Change DB credentials in `.env` before running.
 - For Apache, point document root to `public/`.
+- Attendance routes are available at `/attendance` and `/attendance/history` for `super_admin`, `admin`, and `faculty`.

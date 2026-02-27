@@ -23,6 +23,7 @@ session_start();
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
 use App\Controllers\StudentController;
+use App\Controllers\AttendanceController;
 use App\Middleware\RequireAuth;
 use App\Middleware\RequireRole;
 
@@ -32,7 +33,9 @@ $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
 $auth = new AuthController();
 $dashboard = new DashboardController();
 $students = new StudentController();
+$attendance = new AttendanceController();
 
+try {
 if ($path === '/') {
     redirect('/login');
 }
@@ -95,5 +98,32 @@ if ($path === '/students/delete' && $method === 'POST') {
     exit;
 }
 
+
+if ($path === '/attendance' && $method === 'GET') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $attendance->index();
+    exit;
+}
+
+if ($path === '/attendance/mark' && $method === 'POST') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $attendance->store();
+    exit;
+}
+
+if ($path === '/attendance/history' && $method === 'GET') {
+    RequireRole::handle(['super_admin', 'admin', 'faculty']);
+    $attendance->history();
+    exit;
+}
+
 http_response_code(404);
 echo 'Not Found';
+
+} catch (\PDOException $exception) {
+    http_response_code(500);
+    view('errors/500', [
+        'title' => 'Database Error',
+        'message' => 'Database connection failed. Please verify DB settings and that MySQL is running.',
+    ]);
+}
