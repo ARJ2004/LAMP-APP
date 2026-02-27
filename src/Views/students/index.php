@@ -3,7 +3,12 @@
         <h1 class="h3 page-title mb-1">Student Management</h1>
         <p class="page-subtitle mb-0">Search and maintain student records.</p>
     </div>
-    <a href="/students/create" class="btn btn-primary">Add Student</a>
+    <div class="d-flex gap-2">
+        <?php if (($_SESSION['user']['role_name'] ?? '') === 'super_admin'): ?>
+            <a href="/students/register-account" class="btn btn-outline-primary">Register Student Account</a>
+        <?php endif; ?>
+        <a href="/students/create" class="btn btn-primary">Add Student</a>
+    </div>
 </div>
 
 <div class="card-clean p-3 mb-3">
@@ -37,8 +42,8 @@
                         <td><?= (int)$student['id'] ?></td>
                         <td><?= e($student['roll_number']) ?></td>
                         <td class="fw-medium"><?= e($student['full_name']) ?></td>
-                        <td><?= e($student['email']) ?></td>
-                        <td><?= e($student['department']) ?></td>
+                        <td><?= e((string)$student['email']) ?></td>
+                        <td><?= e((string)$student['department']) ?></td>
                         <td><?= (int)$student['semester'] ?></td>
                         <td class="text-end pe-3">
                             <a class="btn btn-sm btn-outline-primary" href="/students/edit?id=<?= (int)$student['id'] ?>">Edit</a>

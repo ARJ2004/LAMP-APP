@@ -18,8 +18,8 @@
     </div>
     <div class="col-sm-6 col-lg-3">
         <div class="card-clean p-3 h-100">
-            <div class="metric-label">Student Module</div>
-            <div class="metric-value">Live</div>
+            <div class="metric-label">Module Count</div>
+            <div class="metric-value"><?= count($modules ?? []) ?></div>
         </div>
     </div>
     <div class="col-sm-6 col-lg-3">
@@ -33,10 +33,6 @@
 <div class="card-clean p-4 mb-4">
     <div class="d-flex flex-wrap justify-content-between gap-2 mb-3 align-items-center">
         <h2 class="h5 mb-0">Modules</h2>
-        <div class="d-flex gap-2">
-            <a href="/students" class="btn btn-primary btn-sm">Students</a>
-            <a href="/attendance" class="btn btn-outline-primary btn-sm">Attendance</a>
-        </div>
     </div>
     <div class="d-flex flex-wrap gap-2">
         <?php foreach (($modules ?? []) as $module): ?>
