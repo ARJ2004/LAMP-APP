@@ -17,18 +17,16 @@
                     College ERP
                 </a>
                 <?php if (!empty($_SESSION['user'])): ?>
-                    <div class="d-none d-md-flex gap-2">
-                        <a href="/students" class="btn btn-sm btn-soft">Students</a>
-                        <a href="/attendance" class="btn btn-sm btn-soft">Attendance</a>
-                        <a href="/results" class="btn btn-sm btn-soft">Results</a>
-                        <?php if (($_SESSION['user']['role_name'] ?? '') === 'faculty'): ?>
-                            <a href="/teacher/dashboard" class="btn btn-sm btn-soft">Teacher Dashboard</a>
                     <?php $role = $_SESSION['user']['role_name'] ?? ''; ?>
                     <div class="d-none d-md-flex gap-2 flex-wrap">
                         <?php if (in_array($role, ['super_admin', 'admin', 'faculty'], true)): ?>
                             <a href="/students" class="btn btn-sm btn-soft">Students</a>
                             <a href="/courses" class="btn btn-sm btn-soft">Courses</a>
                             <a href="/attendance" class="btn btn-sm btn-soft">Attendance</a>
+                            <a href="/results" class="btn btn-sm btn-soft">Results</a>
+                        <?php endif; ?>
+                        <?php if ($role === 'faculty'): ?>
+                            <a href="/teacher/dashboard" class="btn btn-sm btn-soft">Teacher Dashboard</a>
                         <?php endif; ?>
                         <?php if ($role === 'super_admin'): ?>
                             <a href="/students/register-account" class="btn btn-sm btn-soft">Register Student</a>
@@ -41,20 +39,23 @@
                     </div>
                 <?php endif; ?>
             </div>
-            <?php if (!empty($_SESSION['user'])): ?>
-                <div class="d-flex align-items-center gap-2">
-                    <span class="small text-muted d-none d-md-inline">Welcome, <?= e($_SESSION['user']['name']) ?></span>
-                    <span class="badge badge-role rounded-pill"><?= e($_SESSION['user']['role_name']) ?></span>
-                    <form action="/logout" method="post" class="m-0">
+            <div class="d-flex align-items-center gap-2">
+                <?php if (!empty($_SESSION['user'])): ?>
+                    <span class="small text-secondary">Hi, <?= e($_SESSION['user']['name']) ?> (<?= e($_SESSION['user']['role_name']) ?>)</span>
+                    <form method="post" action="/logout" class="m-0">
                         <input type="hidden" name="_csrf" value="<?= e(csrf_token()) ?>">
-                        <button class="btn btn-sm btn-outline-secondary">Logout</button>
+                        <button class="btn btn-sm btn-outline-danger">Logout</button>
                     </form>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
-    <main class="container py-4 flex-grow-1">
-        <?php require $templatePath; ?>
+
+    <main class="container pb-5 flex-grow-1">
+        <?php if ($flash = flash_get()): ?>
+            <div class="alert alert-<?= e($flash['type']) ?> mt-3" role="alert"><?= e($flash['message']) ?></div>
+        <?php endif; ?>
+        <?php require $viewFile; ?>
     </main>
 </div>
 </body>
